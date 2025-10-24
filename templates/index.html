@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Crowd Management System</title>
+    <title>Advanced Crowd Management System - Stampede Prevention</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Advanced Crowd Management System</h1>
+            <p>Real-time Crowd Monitoring & Stampede Prevention</p>
         </header>
         
         <main>
@@ -22,6 +23,11 @@
                     <div class="controls">
                         <button id="start-btn" class="btn btn-primary">Start Camera</button>
                         <button id="stop-btn" class="btn btn-danger" disabled>Stop Camera</button>
+                        <div class="video-upload">
+                            <input type="file" id="video-upload" accept="video/*" style="display: none;">
+                            <button id="upload-btn" class="btn btn-info">Upload Video</button>
+                            <button id="process-video-btn" class="btn btn-warning" disabled>Process Video</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -37,8 +43,47 @@
                     </div>
                     
                     <div class="stats-card">
+                        <h3>Stampede Risk</h3>
+                        <div id="stampede-risk" class="stat-value risk-low">Low</div>
+                    </div>
+                    
+                    <div class="stats-card">
                         <h3>FPS</h3>
                         <div id="fps" class="stat-value">0.00</div>
+                    </div>
+                </div>
+                
+                <div class="risk-factors-section">
+                    <h3>Risk Factors</h3>
+                    <div class="risk-factors-grid">
+                        <div class="risk-factor">
+                            <span class="factor-label">Density</span>
+                            <div class="progress-bar">
+                                <div id="density-progress" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span id="density-value" class="factor-value">0%</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span class="factor-label">Velocity</span>
+                            <div class="progress-bar">
+                                <div id="velocity-progress" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span id="velocity-value" class="factor-value">0%</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span class="factor-label">Direction</span>
+                            <div class="progress-bar">
+                                <div id="direction-progress" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span id="direction-value" class="factor-value">0%</span>
+                        </div>
+                        <div class="risk-factor">
+                            <span class="factor-label">Acceleration</span>
+                            <div class="progress-bar">
+                                <div id="acceleration-progress" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span id="acceleration-value" class="factor-value">0%</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -54,14 +99,22 @@
                     <div class="data-controls">
                         <button id="reset-btn" class="btn btn-warning">Reset Database</button>
                         <button id="export-btn" class="btn btn-info">Export Data</button>
+                        <button id="export-stampede-btn" class="btn btn-danger">Export Stampede Report</button>
                     </div>
                     <div id="data-message" class="data-message"></div>
+                </div>
+                
+                <div class="incident-section">
+                    <h3>Recent Stampede Incidents</h3>
+                    <div id="incident-list" class="incident-list">
+                        <p>No incidents recorded yet.</p>
+                    </div>
                 </div>
             </div>
         </main>
         
         <footer>
-            <p>Advanced Crowd Management System &copy; 2025</p>
+            <p>Advanced Crowd Management System &copy; 2025 | Stampede Prevention Technology</p>
         </footer>
     </div>
     

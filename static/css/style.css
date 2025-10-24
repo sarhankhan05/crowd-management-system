@@ -34,6 +34,12 @@ header h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+header p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
 .dashboard {
     display: grid;
     grid-template-columns: 1fr;
@@ -77,6 +83,13 @@ header h1 {
     gap: 15px;
     justify-content: center;
     flex-wrap: wrap;
+    align-items: center;
+}
+
+.video-upload {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .btn {
@@ -144,7 +157,7 @@ header h1 {
 
 .stats-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
@@ -163,7 +176,7 @@ header h1 {
 }
 
 .stat-value {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
 }
 
@@ -181,6 +194,22 @@ header h1 {
 
 .alert-critical {
     color: #e74c3c;
+}
+
+.risk-low {
+    color: #27ae60;
+}
+
+.risk-medium {
+    color: #f39c12;
+}
+
+.risk-high {
+    color: #e74c3c;
+}
+
+.risk-critical {
+    color: #c0392b;
 }
 
 .alert-section {
@@ -203,6 +232,56 @@ header h1 {
     font-size: 1.1rem;
 }
 
+.risk-factors-section {
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.risk-factors-section h3 {
+    margin-bottom: 20px;
+    color: #bbb;
+    text-align: center;
+}
+
+.risk-factors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.risk-factor {
+    text-align: center;
+}
+
+.factor-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #ddd;
+}
+
+.progress-bar {
+    height: 10px;
+    background-color: #444;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #27ae60, #f39c12, #e74c3c);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.factor-value {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
 .data-section {
     background-color: #2d2d2d;
     border-radius: 10px;
@@ -220,6 +299,7 @@ header h1 {
     gap: 15px;
     flex-wrap: wrap;
     margin-bottom: 15px;
+    justify-content: center;
 }
 
 .data-message {
@@ -231,6 +311,59 @@ header h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.incident-section {
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.incident-section h3 {
+    margin-bottom: 15px;
+    color: #bbb;
+    text-align: center;
+}
+
+.incident-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 6px;
+}
+
+.incident-item {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    font-size: 0.9rem;
+}
+
+.incident-item:last-child {
+    border-bottom: none;
+}
+
+.incident-time {
+    color: #777;
+    font-size: 0.8rem;
+}
+
+.incident-risk {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.incident-risk-high {
+    color: #e74c3c;
+}
+
+.incident-risk-medium {
+    color: #f39c12;
+}
+
+.incident-risk-low {
+    color: #27ae60;
 }
 
 footer {
@@ -255,7 +388,7 @@ footer {
         height: 300px;
     }
     
-    .stats-section {
+    .stats-section, .risk-factors-grid {
         grid-template-columns: 1fr;
     }
     
@@ -268,6 +401,15 @@ footer {
         width: 100%;
         max-width: 300px;
     }
+    
+    .stat-value {
+        font-size: 1.8rem;
+    }
+    
+    .video-upload {
+        flex-direction: column;
+        width: 100%;
+    }
 }
 
 /* Animation for critical alerts */
@@ -279,4 +421,15 @@ footer {
 
 .alert-critical-animated {
     animation: pulse 1s infinite;
+}
+
+/* Animation for high risk */
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+.risk-high-animated {
+    animation: flash 0.8s infinite;
 }

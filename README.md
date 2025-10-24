@@ -1,189 +1,206 @@
-# Advanced Crowd Management System
+# Advanced Crowd Management System with Stampede Prevention
 
-An intelligent crowd monitoring and management system using computer vision technologies for real-time people counting and crowd analysis with a modern web-based interface.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/flask-2.0%2B-blue.svg)](https://palletsprojects.com/p/flask/)
 
-![System Architecture](docs/architecture.png)
+An intelligent crowd monitoring and management system designed to prevent stampedes in crowded environments using computer vision and real-time analytics.
 
 ## Features
 
-- Real-time crowd detection using YOLOv3 object detection
-- Facial recognition within detected crowds
-- Dynamic crowd alert system with customizable thresholds
-- Live camera feed with people counting
-- Historical data tracking and analytics
-- Export functionality for reports and data
-- Modern, responsive web interface
-- Cross-platform compatibility
+### Core Detection Capabilities
+- **Real-time People Detection**: Uses YOLOv3 object detection to identify and count people in video feeds
+- **Face Recognition**: Haar Cascade face detection for additional identification
+- **Multi-person Tracking**: Tracks individual movement patterns over time
+- **Database Storage**: SQLite database for storing detection history and incidents
 
-## Technologies Used
+### Stampede Prevention Features
+- **Risk Assessment Algorithms**: Calculates stampede risk based on multiple factors:
+  - **Crowd Density**: Monitors how densely packed people are in the area
+  - **Movement Velocity**: Tracks how fast people are moving
+  - **Direction Coherence**: Analyzes if people are moving in coordinated or chaotic directions
+  - **Acceleration Changes**: Detects sudden changes in movement patterns
+- **Real-time Risk Scoring**: Continuous assessment with visual indicators
+- **Predictive Analytics**: Early warning system for potential stampede conditions
+- **Emergency Alert System**: Automatic notifications when high-risk situations are detected
+- **Incident Documentation**: Automatic logging of all high-risk events
+- **Historical Trend Analysis**: Review past incidents and patterns
 
-- **Python** - Core programming language
-- **Flask** - Web framework for the user interface
-- **OpenCV** - Computer vision and image processing
-- **YOLOv3** - Object detection model
-- **SQLite** - Local database storage
-- **HTML/CSS/JavaScript** - Frontend interface
-- **Haar Cascades** - Face detection
+For detailed information about stampede prevention features, see [Stampede Prevention Features Documentation](docs/STAMPEDE_PREVENTION_FEATURES.md).
 
-## Architecture
+### User Interface
+- **Modern Web Dashboard**: Responsive web interface for monitoring
+- **Live Video Feed**: Real-time camera feed with detection overlays
+- **Statistics Panel**: Current people count, alert levels, and risk scores
+- **Risk Factor Visualization**: Progress bars showing individual risk components
+- **Incident History**: List of recent high-risk events
+- **Data Export**: Export detection data and stampede reports to CSV
 
-The system is organized into the following components:
+## System Architecture
 
 ```
-crowd-management-system/
-├── app.py                 # Main Flask application
-├── config.py              # Configuration settings
-├── setup.py               # Package setup
-├── requirements.txt       # Python dependencies
-├── README.md              # Project documentation
-├── .gitignore             # Git ignore rules
-├── core/                  # Core logic modules
-│   ├── __init__.py        # Package initializer
-│   └── detection.py       # Computer vision and detection logic
-├── templates/             # HTML templates
-│   ├── __init__.py        # Package initializer
-│   └── index.html         # Main interface template
-├── static/                # Static assets
-│   ├── __init__.py        # Package initializer
-│   ├── css/               # Stylesheets
-│   │   ├── __init__.py    # Package initializer
-│   │   └── style.css      # Main stylesheet
-│   ├── js/                # JavaScript files
-│   │   ├── __init__.py    # Package initializer
-│   │   └── main.js        # Frontend logic
-│   └── images/            # Image assets
-│       ├── __init__.py    # Package initializer
-├── components/            # Reusable UI components
-│   └── __init__.py        # Package initializer
-├── docs/                  # Documentation
-│   ├── architecture.md    # System architecture
-│   ├── user_guide.md      # User guide
-│   └── development.md     # Development guide
-├── tests/                 # Unit tests
-│   ├── __init__.py        # Package initializer
-│   └── test_detection.py  # Detection tests
-├── yolov3.cfg             # YOLOv3 configuration
-├── yolov3.weights         # YOLOv3 pre-trained weights (needs to be downloaded)
-├── coco.names             # Object class names
-├── haarcascade_frontalface_default.xml  # Face detection model
-├── detection_database.db  # SQLite database for storing detection data
-└── verify_installation.py # Installation verification script
+Crowd Management System
+├── Core Detection Module (core/detection.py)
+│   ├── YOLOv3 Object Detection
+│   ├── Haar Cascade Face Detection
+│   ├── Stampede Risk Assessment
+│   ├── Movement Pattern Analysis
+│   └── Database Integration
+├── Web Interface (app.py)
+│   ├── Flask Web Server
+│   ├── REST API Endpoints
+│   ├── Real-time Video Streaming
+│   └── Data Management
+├── Frontend (templates/, static/)
+│   ├── HTML Templates
+│   ├── CSS Styling
+│   └── JavaScript Interactivity
+└── Utilities
+    ├── Installation Scripts
+    ├── Model Downloaders
+    └── System Checkers
 ```
-
-For detailed architecture information, see [Architecture Documentation](docs/architecture.md).
-
-## Prerequisites
-
-Before you begin, ensure you have met the following requirements:
-
-- Python 3.8 or higher
-- Windows, macOS, or Linux operating system
-- Camera device (built-in or external)
 
 ## Installation
 
-1. Clone the repository:
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+- Camera device (webcam or IP camera)
+
+### Quick Setup
+
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/sarhankhan05/crowd-management-system
    cd crowd-management-system
    ```
 
-2. Create a virtual environment:
+2. **Run the installation script**:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   # On Windows
+   install.bat
+   
+   # On Linux/Mac
+   ./install.sh
    ```
 
-3. Install the required dependencies:
+3. **Download YOLOv3 weights**:
+   ```bash
+   python download_weights.py
+   ```
+
+4. **Verify installation**:
+   ```bash
+   python verify_installation.py
+   ```
+
+### Manual Installation
+
+1. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Download the YOLOv3 weights file:
-   - Download `yolov3.weights` from [YOLO website](https://pjreddie.com/darknet/yolo/)
-   - Place the file in the project root directory
+2. **Download YOLOv3 weights**:
+   - Download from: https://pjreddie.com/media/files/yolov3.weights
+   - Place in the project root directory
 
 ## Usage
 
-To run the application, execute:
+### Starting the System
 
-```bash
-python app.py
-```
+1. **Run the application**:
+   ```bash
+   # On Windows
+   run.bat
+   
+   # On Linux/Mac
+   ./run.sh
+   
+   # Or directly
+   python app.py
+   ```
 
-Then open your web browser and navigate to `http://localhost:5000`
+2. **Access the web interface**:
+   - Open your browser to `http://localhost:5000`
 
-### Web Interface Controls
+### Operating the System
 
-- **Start Camera**: Begin crowd detection on the default camera feed
-- **Stop Camera**: Stop the camera feed
-- **Reset Database**: Clear all stored detection data
-- **Export Data**: Export detection history to CSV format
+1. **Start Camera**: Click the "Start Camera" button to begin detection
+2. **Monitor Crowd**: Watch the live feed and statistics panel
+3. **Check Risk Levels**: Monitor the stampede risk indicator
+4. **Review Incidents**: Check the incident history for high-risk events
+5. **Export Data**: Use the export buttons to save reports
 
-### Alert System
+### Alert Levels
 
-The system provides four levels of crowd alerts:
-- **Normal** (Green): Low crowd density
-- **Caution** (Yellow): Moderate crowd levels
-- **Warning** (Orange): High crowd density
-- **Critical** (Red): Overcrowding detected
+- **Normal (Green)**: Low crowd density, no risk factors
+- **Caution (Yellow)**: Moderate crowd detected
+- **Warning (Orange)**: Large crowd, increased monitoring needed
+- **Critical (Red)**: Overcrowding detected, immediate attention required
+- **Stampede Risk (Flashing Red)**: High probability of stampede, emergency response needed
+
+### Risk Factors
+
+1. **Density**: How crowded the area is (0-100%)
+2. **Velocity**: Average speed of movement (0-100%)
+3. **Direction**: Coherence of movement directions (0-100%)
+4. **Acceleration**: Rate of speed changes (0-100%)
+
+## Configuration
+
+The system can be configured through `config.py`:
+
+- **Camera Settings**: Adjust camera ID and resolution
+- **Detection Thresholds**: Modify confidence levels for detection
+- **Alert Thresholds**: Set crowd count levels for different alerts
+- **Risk Thresholds**: Configure risk scoring parameters
 
 ## API Endpoints
 
-The application provides the following REST API endpoints:
-
-- `GET /` - Main web interface
+- `GET /` - Main dashboard
 - `GET /start_camera` - Start camera feed
 - `GET /stop_camera` - Stop camera feed
-- `GET /video_feed` - Stream video feed
-- `GET /stats` - Get current detection statistics
-- `GET /history` - Get detection history
-- `GET /reset_database` - Reset detection database
-- `GET /export_data` - Export detection data to CSV
+- `GET /video_feed` - Live video stream
+- `GET /stats` - Current statistics
+- `GET /history` - Detection history
+- `GET /stampede_incidents` - Stampede incident reports
+- `GET /reset_database` - Clear all data
+- `GET /export_data` - Export detection data
+- `GET /export_stampede_report` - Export stampede report
 
 ## Development
 
-For development information, see [Development Guide](docs/development.md).
+### Project Structure
+```
+crowd-management-system/
+├── core/                 # Core detection logic
+├── templates/            # HTML templates
+├── static/               # CSS, JavaScript, images
+├── tests/                # Unit tests
+├── docs/                 # Documentation
+├── requirements.txt      # Python dependencies
+├── app.py               # Main Flask application
+├── config.py            # Configuration settings
+├── setup.py             # Installation script
+└── README.md            # This file
+```
 
 ### Running Tests
-
 ```bash
-python -m unittest discover tests
-```
-
-### Verification Script
-
-Run the verification script to check if all components are properly installed:
-
-```bash
-python verify_installation.py
-```
-
-## Docker Deployment
-
-The application can be deployed using Docker:
-
-```bash
-docker build -t crowd-management-system .
-docker run -p 5000:5000 crowd-management-system
-```
-
-Or using docker-compose:
-
-```bash
-docker-compose up
+python -m pytest tests/
 ```
 
 ## Contributing
 
-Contributions to the project are welcome. To contribute:
-
 1. Fork the repository
-2. Create a new branch (`git checkout -b feature/AmazingFeature`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-5. Push to the branch (`git push origin feature/AmazingFeature`)
-6. Open a pull request
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and development process.
 
 ## License
 
@@ -191,10 +208,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [YOLOv3](https://pjreddie.com/darknet/yolo/) for object detection
-- [OpenCV](https://opencv.org/) for computer vision tools
-- [Flask](https://flask.palletsprojects.com/) for the web framework
+- YOLOv3 for object detection capabilities
+- OpenCV for computer vision functions
+- Flask for web framework
+- Haar Cascades for face detection
 
-## Contact
+## Support
 
-For questions or feedback, please open an issue on the GitHub repository.
+For support, please open an issue on GitHub or contact the development team.
+
+---
+
+**Prevent stampedes. Save lives.**
