@@ -33,7 +33,7 @@ Before you begin, ensure you have met the following requirements:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/crowd-management-system.git
+   git clone https://github.com/sarhankhan05/crowd-management-system
    cd crowd-management-system
    ```
 
@@ -116,3 +116,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 For questions or feedback, please open an issue on the GitHub repository.
+
+For support, email sarhankhan05@gmail.com or file an issue on GitHub.
