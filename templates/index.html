@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Crowd Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Advanced Crowd Management System</h1>
+        </header>
+        
+        <main>
+            <div class="dashboard">
+                <div class="video-section">
+                    <div class="video-container">
+                        <img id="video-feed" src="" alt="Camera Feed" style="display: none;">
+                        <div id="no-feed-message">Camera feed not started</div>
+                    </div>
+                    <div class="controls">
+                        <button id="start-btn" class="btn btn-primary">Start Camera</button>
+                        <button id="stop-btn" class="btn btn-danger" disabled>Stop Camera</button>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <div class="stats-card">
+                        <h3>People Count</h3>
+                        <div id="people-count" class="stat-value">0</div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <h3>Alert Level</h3>
+                        <div id="alert-level" class="stat-value alert-normal">Normal</div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <h3>FPS</h3>
+                        <div id="fps" class="stat-value">0.00</div>
+                    </div>
+                </div>
+                
+                <div class="alert-section">
+                    <h3>Current Status</h3>
+                    <div id="alert-message" class="alert-message">
+                        System ready. Start camera to begin detection.
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3>Data Management</h3>
+                    <div class="data-controls">
+                        <button id="reset-btn" class="btn btn-warning">Reset Database</button>
+                        <button id="export-btn" class="btn btn-info">Export Data</button>
+                    </div>
+                    <div id="data-message" class="data-message"></div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Advanced Crowd Management System &copy; 2025</p>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

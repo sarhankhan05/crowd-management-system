@@ -1,6 +1,8 @@
 # Advanced Crowd Management System
 
-An intelligent crowd monitoring and management system using computer vision technologies for real-time people counting and crowd analysis.
+An intelligent crowd monitoring and management system using computer vision technologies for real-time people counting and crowd analysis with a modern web-based interface.
+
+![System Architecture](docs/architecture.png)
 
 ## Features
 
@@ -10,16 +12,65 @@ An intelligent crowd monitoring and management system using computer vision tech
 - Live camera feed with people counting
 - Historical data tracking and analytics
 - Export functionality for reports and data
-- Modern, intuitive user interface
+- Modern, responsive web interface
+- Cross-platform compatibility
 
 ## Technologies Used
 
 - **Python** - Core programming language
-- **PyQt5** - Desktop GUI framework
+- **Flask** - Web framework for the user interface
 - **OpenCV** - Computer vision and image processing
 - **YOLOv3** - Object detection model
 - **SQLite** - Local database storage
+- **HTML/CSS/JavaScript** - Frontend interface
 - **Haar Cascades** - Face detection
+
+## Architecture
+
+The system is organized into the following components:
+
+```
+crowd-management-system/
+├── app.py                 # Main Flask application
+├── config.py              # Configuration settings
+├── setup.py               # Package setup
+├── requirements.txt       # Python dependencies
+├── README.md              # Project documentation
+├── .gitignore             # Git ignore rules
+├── core/                  # Core logic modules
+│   ├── __init__.py        # Package initializer
+│   └── detection.py       # Computer vision and detection logic
+├── templates/             # HTML templates
+│   ├── __init__.py        # Package initializer
+│   └── index.html         # Main interface template
+├── static/                # Static assets
+│   ├── __init__.py        # Package initializer
+│   ├── css/               # Stylesheets
+│   │   ├── __init__.py    # Package initializer
+│   │   └── style.css      # Main stylesheet
+│   ├── js/                # JavaScript files
+│   │   ├── __init__.py    # Package initializer
+│   │   └── main.js        # Frontend logic
+│   └── images/            # Image assets
+│       ├── __init__.py    # Package initializer
+├── components/            # Reusable UI components
+│   └── __init__.py        # Package initializer
+├── docs/                  # Documentation
+│   ├── architecture.md    # System architecture
+│   ├── user_guide.md      # User guide
+│   └── development.md     # Development guide
+├── tests/                 # Unit tests
+│   ├── __init__.py        # Package initializer
+│   └── test_detection.py  # Detection tests
+├── yolov3.cfg             # YOLOv3 configuration
+├── yolov3.weights         # YOLOv3 pre-trained weights (needs to be downloaded)
+├── coco.names             # Object class names
+├── haarcascade_frontalface_default.xml  # Face detection model
+├── detection_database.db  # SQLite database for storing detection data
+└── verify_installation.py # Installation verification script
+```
+
+For detailed architecture information, see [Architecture Documentation](docs/architecture.md).
 
 ## Prerequisites
 
@@ -57,14 +108,15 @@ Before you begin, ensure you have met the following requirements:
 To run the application, execute:
 
 ```bash
-python UI.py
+python app.py
 ```
 
-### Controls
+Then open your web browser and navigate to `http://localhost:5000`
 
-- **Start Camera**: Begin crowd detection on the selected camera feed
+### Web Interface Controls
+
+- **Start Camera**: Begin crowd detection on the default camera feed
 - **Stop Camera**: Stop the camera feed
-- **Change Camera Feed**: Switch between available camera devices
 - **Reset Database**: Clear all stored detection data
 - **Export Data**: Export detection history to CSV format
 
@@ -76,20 +128,50 @@ The system provides four levels of crowd alerts:
 - **Warning** (Orange): High crowd density
 - **Critical** (Red): Overcrowding detected
 
-Alert thresholds can be adjusted in the settings panel.
+## API Endpoints
 
-## Project Structure
+The application provides the following REST API endpoints:
 
+- `GET /` - Main web interface
+- `GET /start_camera` - Start camera feed
+- `GET /stop_camera` - Stop camera feed
+- `GET /video_feed` - Stream video feed
+- `GET /stats` - Get current detection statistics
+- `GET /history` - Get detection history
+- `GET /reset_database` - Reset detection database
+- `GET /export_data` - Export detection data to CSV
+
+## Development
+
+For development information, see [Development Guide](docs/development.md).
+
+### Running Tests
+
+```bash
+python -m unittest discover tests
 ```
-crowd-management-system/
-├── UI.py                 # Main application interface
-├── yolov3.cfg            # YOLOv3 configuration
-├── yolov3.weights        # YOLOv3 pre-trained weights (needs to be downloaded)
-├── coco.names            # Object class names
-├── haarcascade_frontalface_default.xml  # Face detection model
-├── detection_database.db # SQLite database for storing detection data
-├── requirements.txt      # Python dependencies
-└── README.md             # This file
+
+### Verification Script
+
+Run the verification script to check if all components are properly installed:
+
+```bash
+python verify_installation.py
+```
+
+## Docker Deployment
+
+The application can be deployed using Docker:
+
+```bash
+docker build -t crowd-management-system .
+docker run -p 5000:5000 crowd-management-system
+```
+
+Or using docker-compose:
+
+```bash
+docker-compose up
 ```
 
 ## Contributing
@@ -111,10 +193,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [YOLOv3](https://pjreddie.com/darknet/yolo/) for object detection
 - [OpenCV](https://opencv.org/) for computer vision tools
-- PyQt5 for the GUI framework
+- [Flask](https://flask.palletsprojects.com/) for the web framework
 
 ## Contact
 
 For questions or feedback, please open an issue on the GitHub repository.
-
-For support, email sarhankhan05@gmail.com or file an issue on GitHub.

@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = fh.read().splitlines()
+    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
 setup(
     name="crowd-management-system",
@@ -31,11 +31,11 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "crowd-management=UI:main",
+            "crowd-management=app:main",
         ],
     },
     include_package_data=True,
     package_data={
-        "": ["*.xml", "*.cfg", "*.names"],
+        "": ["*.xml", "*.cfg", "*.names", "templates/*.html", "static/css/*.css", "static/js/*.js"],
     },
 )

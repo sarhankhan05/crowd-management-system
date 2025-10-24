@@ -144,3 +144,6 @@ Thumbs.db
 # Application specific
 *.db
 *.weights
+*.csv
+test_sample.jpg
+blank_image.jpg

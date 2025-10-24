@@ -1,0 +1,1 @@
+# Images package for Crowd Management System

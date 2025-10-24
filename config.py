@@ -1,48 +1,61 @@
 # Configuration file for Crowd Management System
 
-# Camera settings
-DEFAULT_CAMERA_ID = 0
-CAMERA_WIDTH = 700
-CAMERA_HEIGHT = 500
-FRAME_RATE = 30
+import os
 
-# Detection settings
-YOLO_CONFIG_FILE = "yolov3.cfg"
-YOLO_WEIGHTS_FILE = "yolov3.weights"
-COCO_NAMES_FILE = "coco.names"
-FACE_CASCADE_FILE = "haarcascade_frontalface_default.xml"
+class Config:
+    # Camera settings
+    DEFAULT_CAMERA_ID = 0
+    CAMERA_WIDTH = 700
+    CAMERA_HEIGHT = 500
+    FRAME_RATE = 30
 
-# Detection thresholds
-CONFIDENCE_THRESHOLD = 0.5
-NMS_THRESHOLD = 0.4
+    # Detection settings
+    YOLO_CONFIG_FILE = "yolov3.cfg"
+    YOLO_WEIGHTS_FILE = "yolov3.weights"
+    COCO_NAMES_FILE = "coco.names"
+    FACE_CASCADE_FILE = "haarcascade_frontalface_default.xml"
 
-# Database settings
-DATABASE_FILE = "detection_database.db"
+    # Detection thresholds
+    CONFIDENCE_THRESHOLD = 0.5
+    NMS_THRESHOLD = 0.4
 
-# Alert settings
-DEFAULT_ALERT_THRESHOLD = 30  # Number of people for critical alert
-ALERT_LEVELS = {
-    "NORMAL": 0,
-    "CAUTION": 1,
-    "WARNING": 2,
-    "CRITICAL": 3
-}
+    # Database settings
+    DATABASE_FILE = "detection_database.db"
 
-# Sound settings
-ALERT_SOUND_DURATION = 500  # milliseconds
-ALERT_SOUND_FREQUENCY = 1000  # Hz
+    # Alert settings
+    ALERT_THRESHOLDS = {
+        "NORMAL": 0,      # 0 people
+        "CAUTION": 10,    # 10+ people
+        "WARNING": 20,    # 20+ people
+        "CRITICAL": 30    # 30+ people
+    }
 
-# UI settings
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 800
-WINDOW_TITLE = "Advanced Crowd Management System"
+    # Web server settings
+    HOST = "0.0.0.0"
+    PORT = 5000
+    DEBUG = True
 
-# Colors (BGR format for OpenCV)
-COLORS = {
-    "GREEN": (0, 255, 0),
-    "RED": (0, 0, 255),
-    "BLUE": (255, 0, 0),
-    "YELLOW": (0, 255, 255),
-    "ORANGE": (0, 165, 255),
-    "PURPLE": (128, 0, 128)
+    # Paths
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+    STATIC_DIR = os.path.join(BASE_DIR, "static")
+    CORE_DIR = os.path.join(BASE_DIR, "core")
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+    TESTING = False
+
+class ProductionConfig(Config):
+    DEBUG = False
+    TESTING = False
+
+class TestingConfig(Config):
+    DEBUG = True
+    TESTING = True
+
+# Configuration dictionary
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig
 }

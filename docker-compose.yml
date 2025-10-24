@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  crowd-management:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+    # Note: Camera access in Docker requires additional configuration
+    # depending on the host system and Docker version

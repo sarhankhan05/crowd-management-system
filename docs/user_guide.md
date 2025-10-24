@@ -9,7 +9,7 @@ The Advanced Crowd Management System is a computer vision application designed t
 ### Hardware
 - Computer with at least 4GB RAM
 - Camera device (built-in or external)
-- Speakers or headphones for audio alerts (optional)
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
 ### Software
 - Windows 10/11, macOS 10.14+, or Linux
@@ -42,16 +42,19 @@ Download the `yolov3.weights` file from the [YOLO website](https://pjreddie.com/
 ### Launching the Application
 Run the application by executing:
 ```bash
-python UI.py
+python app.py
 ```
+
+The application will start a web server on `http://localhost:5000`. Open this URL in your web browser.
 
 ### Interface Overview
 
-The application interface consists of three main sections:
+The web interface consists of several sections:
 
 1. **Video Feed Area**: Displays the live camera feed with people detection overlays
-2. **Control Panel**: Contains all user controls and settings
-3. **Information Panel**: Shows detection history and alert logs
+2. **Statistics Panel**: Shows real-time people count, alert level, and FPS
+3. **Alert Section**: Displays current system status and alerts
+4. **Data Management**: Controls for database operations
 
 ## Using the Application
 
@@ -61,48 +64,48 @@ The application interface consists of three main sections:
 3. Detected people will be highlighted with green bounding boxes
 4. Faces within detected bodies will be highlighted with red bounding boxes
 
-### Adjusting Settings
-- **Camera Selection**: Use the dropdown to select between available cameras
-- **Alert Thresholds**: Adjust crowd density thresholds in the settings panel
-- **Export Data**: Save detection history to CSV format
-
 ### Monitoring Alerts
-The system provides visual and audio alerts when crowd density exceeds thresholds:
-- **Normal** (Green indicator): Low crowd density
-- **Caution** (Yellow indicator): Moderate crowd levels
-- **Warning** (Orange indicator): High crowd density
-- **Critical** (Red indicator): Overcrowding detected
+The system provides visual alerts when crowd density exceeds thresholds:
+- **Normal** (Green text): Low crowd density
+- **Caution** (Yellow text): Moderate crowd levels
+- **Warning** (Orange text): High crowd density
+- **Critical** (Red text with animation): Overcrowding detected
 
-## Data Management
+### Data Management
+- **Reset Database**: Clears all stored detection data
+- **Export Data**: Saves detection history to a CSV file
 
-### Viewing History
-The "Detection History" tab shows a table of all detected objects with timestamps and confidence levels.
+## Alert System
 
-### Alert Log
-The "Alert Log" tab displays all triggered alerts with timestamps.
+The alert system uses the following thresholds:
+- **Normal**: 0-10 people
+- **Caution**: 11-20 people
+- **Warning**: 21-30 people
+- **Critical**: 31+ people
 
-### Exporting Data
-Click "Export Data" to save detection history to a CSV file for further analysis.
-
-### Resetting Database
-Use the "Reset Database" button to clear all stored detection data.
+These thresholds can be adjusted in the `config.py` file.
 
 ## Troubleshooting
 
 ### Camera Not Working
 - Ensure your camera is properly connected
 - Check that no other applications are using the camera
-- Try selecting a different camera from the dropdown
+- Verify camera permissions for your browser
 
 ### Poor Detection Accuracy
 - Ensure adequate lighting conditions
 - Position the camera at an appropriate angle and distance
 - Check that the YOLOv3 weights file is properly downloaded
 
-### Application Crashes
+### Application Not Starting
 - Ensure all dependencies are properly installed
 - Check that you're using a supported Python version
-- Verify that the application has necessary permissions
+- Verify that port 5000 is not being used by another application
+
+### Web Interface Issues
+- Try refreshing the page
+- Clear your browser cache
+- Try a different web browser
 
 ## Frequently Asked Questions
 
@@ -110,13 +113,26 @@ Use the "Reset Database" button to clear all stored detection data.
 The accuracy depends on several factors including camera quality, lighting conditions, and crowd density. Under optimal conditions, the system achieves approximately 90% accuracy.
 
 ### Can I use multiple cameras?
-Yes, the system supports multiple camera feeds. Use the "Change Camera Feed" button or the camera selector dropdown to switch between available cameras.
+The current implementation supports a single camera. Multiple camera support can be added by modifying the camera selection logic in `app.py`.
 
-### How often are alerts triggered?
-Alerts are evaluated in real-time with each frame. Audio alerts are rate-limited to prevent excessive noise.
+### How often are alerts updated?
+Alerts are evaluated in real-time with each frame processed by the detection system.
 
 ### Is my data stored securely?
 All data is stored locally on your device in an SQLite database. No data is transmitted to external servers.
+
+## API Endpoints
+
+For developers who want to integrate with the system programmatically:
+
+- `GET /` - Main web interface
+- `GET /start_camera` - Start camera feed
+- `GET /stop_camera` - Stop camera feed
+- `GET /video_feed` - Stream video feed
+- `GET /stats` - Get current detection statistics
+- `GET /history` - Get detection history
+- `GET /reset_database` - Reset detection database
+- `GET /export_data` - Export detection data to CSV
 
 ## Support
 

@@ -1,0 +1,1 @@
+# JavaScript package for Crowd Management System
