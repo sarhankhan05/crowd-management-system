@@ -43,13 +43,19 @@ class ModernApp(QWidget):
             exit(1)
 
         # Load YOLO
-        self.net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
-        with open("coco.names", "r") as f:
+        # Get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        weights_path = os.path.join(script_dir, "yolov3.weights")
+        cfg_path = os.path.join(script_dir, "yolov3.cfg")
+        coco_names_path = os.path.join(script_dir, "coco.names")
+        cascade_path = os.path.join(script_dir, "haarcascade_frontalface_default.xml")
+        
+        self.net = cv2.dnn.readNet(weights_path, cfg_path)
+        with open(coco_names_path, "r") as f:
             self.classes = f.read().strip().split("\n")
 
         # Face detection
         # Use the direct path to the cascade file
-        cascade_path = "haarcascade_frontalface_default.xml"
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
         self.detected_faces = {}
         self.next_unique_id = 1
