@@ -40,11 +40,16 @@ def initialize_detector():
     """Initialize the crowd detector"""
     global detector
     try:
+        print("Initializing detector...")
         detector = CrowdDetector(Config.DATABASE_FILE)
-        print("Detector initialized successfully")
+        print("✓ Detector initialized successfully")
+        return True
     except Exception as e:
-        print(f"Error initializing detector: {e}")
+        print(f"✗ Error initializing detector: {e}")
+        import traceback
+        traceback.print_exc()
         detector = None
+        return False
 
 def detect_crowd_continuously():
     """Continuously detect crowd in a separate thread"""
@@ -53,66 +58,87 @@ def detect_crowd_continuously():
     frame_count = 0
     start_time = time.time()
     last_stats_update = time.time()
+    error_logged = False
     
     while not stop_detection:
-        with camera_lock:
-            if camera is None or not camera.isOpened():
-                time.sleep(0.005)  # Very short sleep for better responsiveness
-                continue
+        try:
+            with camera_lock:
+                if camera is None or not camera.isOpened():
+                    time.sleep(0.005)  # Very short sleep for better responsiveness
+                    continue
+                
+                ret, frame = camera.read()
+                if not ret:
+                    time.sleep(0.005)  # Very short sleep
+                    continue
             
-            ret, frame = camera.read()
-            if not ret:
-                time.sleep(0.005)  # Very short sleep
-                continue
-        
-        if detector is not None:
-            try:
-                processed_frame, people_count, detections, risk_data = detector.detect_crowd(frame)
-                
-                # Update detection stats more frequently for real-time updates
-                current_time = time.time()
-                if current_time - last_stats_update >= 0.1:  # Update every 100ms for real-time feel
-                    # Update detection stats
-                    detection_stats['people_count'] = people_count
-                    
-                    # Update stampede risk data
-                    detection_stats['stampede_risk'] = risk_data
-                    
-                    # Calculate alert level based on people count and stampede risk
-                    # Fix: Use risk_data['level'] instead of risk_data['risk_level']
-                    risk_level = risk_data.get('level', 'LOW')
-                    if risk_level == 'HIGH':
-                        detection_stats['alert_level'] = 4  # Stampede Risk
-                    elif risk_level == 'MEDIUM':
-                        detection_stats['alert_level'] = 3  # High Risk
-                    elif people_count <= Config.ALERT_THRESHOLDS["CAUTION"]:
-                        detection_stats['alert_level'] = 0  # Normal
-                    elif people_count <= Config.ALERT_THRESHOLDS["WARNING"]:
-                        detection_stats['alert_level'] = 1  # Caution
-                    elif people_count <= Config.ALERT_THRESHOLDS["CRITICAL"]:
-                        detection_stats['alert_level'] = 2  # Warning
-                    else:
-                        detection_stats['alert_level'] = 3  # Critical
-                    
-                    # Calculate FPS more frequently for better accuracy
-                    frame_count += 1
-                    if frame_count % 10 == 0:  # Update FPS every 10 frames
-                        elapsed_time = time.time() - start_time
-                        if elapsed_time > 0:  # Avoid division by zero
-                            detection_stats['fps'] = round(frame_count / elapsed_time, 2)
-                        frame_count = 0
-                        start_time = time.time()
-                    
-                    last_stats_update = current_time
-                
-                # Store the processed frame
-                with frame_lock:
-                    current_frame = processed_frame
-                    
-            except Exception as e:
-                print(f"Error in detection: {e}")
+            # ALWAYS store the raw frame as fallback
+            if frame is not None:
                 with frame_lock:
                     current_frame = frame
+            
+            if detector is not None:
+                try:
+                    processed_frame, people_count, detections, risk_data = detector.detect_crowd(frame)
+                    error_logged = False  # Reset error flag on success
+                    
+                    # Update detection stats more frequently for real-time updates
+                    current_time = time.time()
+                    if current_time - last_stats_update >= 0.1:  # Update every 100ms for real-time feel
+                        # Update detection stats
+                        detection_stats['people_count'] = people_count
+                        
+                        # Update stampede risk data
+                        detection_stats['stampede_risk'] = risk_data
+                        
+                        # Calculate alert level based on people count and stampede risk
+                        # Fix: Use risk_data['level'] instead of risk_data['risk_level']
+                        risk_level = risk_data.get('level', 'LOW')
+                        if risk_level == 'HIGH':
+                            detection_stats['alert_level'] = 4  # Stampede Risk
+                        elif risk_level == 'MEDIUM':
+                            detection_stats['alert_level'] = 3  # High Risk
+                        elif people_count <= Config.ALERT_THRESHOLDS["CAUTION"]:
+                            detection_stats['alert_level'] = 0  # Normal
+                        elif people_count <= Config.ALERT_THRESHOLDS["WARNING"]:
+                            detection_stats['alert_level'] = 1  # Caution
+                        elif people_count <= Config.ALERT_THRESHOLDS["CRITICAL"]:
+                            detection_stats['alert_level'] = 2  # Warning
+                        else:
+                            detection_stats['alert_level'] = 3  # Critical
+                        
+                        # Calculate FPS more frequently for better accuracy
+                        frame_count += 1
+                        if frame_count % 10 == 0:  # Update FPS every 10 frames
+                            elapsed_time = time.time() - start_time
+                            if elapsed_time > 0:  # Avoid division by zero
+                                detection_stats['fps'] = round(frame_count / elapsed_time, 2)
+                            frame_count = 0
+                            start_time = time.time()
+                        
+                        last_stats_update = current_time
+                    
+                    # Store the processed frame
+                    with frame_lock:
+                        current_frame = processed_frame
+                        
+                except Exception as e:
+                    if not error_logged:
+                        print(f"Error in detection: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        error_logged = True
+                    # Frame is already stored as fallback above
+            else:
+                # Detector not initialized - frame already stored as fallback
+                if not error_logged:
+                    print("Warning: Detector not initialized")
+                    error_logged = True
+        
+        except Exception as e:
+            print(f"Unexpected error in detect_crowd_continuously: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Very short sleep for maximum performance
         time.sleep(0.001)
@@ -124,65 +150,88 @@ def process_video_continuously():
     frame_count = 0
     start_time = time.time()
     last_stats_update = time.time()
+    error_logged = False
     
     # Get video FPS for better timing
     fps = video_capture.get(cv2.CAP_PROP_FPS) if video_capture else 30
     frame_delay = 1.0 / fps if fps > 0 else 0.033  # Default to 30 FPS if unknown
     
     while video_processing and video_capture is not None:
-        ret, frame = video_capture.read()
-        if not ret:
-            # End of video
-            video_processing = False
-            break
+        try:
+            ret, frame = video_capture.read()
+            if not ret:
+                # End of video
+                video_processing = False
+                break
             
-        if detector is not None:
-            try:
-                processed_frame, people_count, detections, risk_data = detector.detect_crowd(frame)
-                
-                # Update detection stats more frequently for real-time updates
-                current_time = time.time()
-                if current_time - last_stats_update >= 0.1:  # Update every 100ms for real-time feel
-                    # Update detection stats
-                    detection_stats['people_count'] = people_count
-                    
-                    # Update stampede risk data
-                    detection_stats['stampede_risk'] = risk_data
-                    
-                    # Calculate alert level based on people count and stampede risk
-                    risk_level = risk_data.get('level', 'LOW')
-                    if risk_level == 'HIGH':
-                        detection_stats['alert_level'] = 4  # Stampede Risk
-                    elif risk_level == 'MEDIUM':
-                        detection_stats['alert_level'] = 3  # High Risk
-                    elif people_count <= Config.ALERT_THRESHOLDS["CAUTION"]:
-                        detection_stats['alert_level'] = 0  # Normal
-                    elif people_count <= Config.ALERT_THRESHOLDS["WARNING"]:
-                        detection_stats['alert_level'] = 1  # Caution
-                    elif people_count <= Config.ALERT_THRESHOLDS["CRITICAL"]:
-                        detection_stats['alert_level'] = 2  # Warning
-                    else:
-                        detection_stats['alert_level'] = 3  # Critical
-                    
-                    # Calculate FPS more frequently for better accuracy
-                    frame_count += 1
-                    if frame_count % 10 == 0:  # Update FPS every 10 frames
-                        elapsed_time = time.time() - start_time
-                        if elapsed_time > 0:  # Avoid division by zero
-                            detection_stats['fps'] = round(frame_count / elapsed_time, 2)
-                        frame_count = 0
-                        start_time = time.time()
-                    
-                    last_stats_update = current_time
-                
-                # Store the processed frame
-                with frame_lock:
-                    current_frame = processed_frame
-                    
-            except Exception as e:
-                print(f"Error in video processing: {e}")
+            # ALWAYS store the raw frame as fallback
+            if frame is not None:
                 with frame_lock:
                     current_frame = frame
+            
+            if detector is not None:
+                try:
+                    processed_frame, people_count, detections, risk_data = detector.detect_crowd(frame)
+                    error_logged = False  # Reset error flag on success
+                    
+                    # Update detection stats more frequently for real-time updates
+                    current_time = time.time()
+                    if current_time - last_stats_update >= 0.1:  # Update every 100ms for real-time feel
+                        # Update detection stats
+                        detection_stats['people_count'] = people_count
+                        
+                        # Update stampede risk data
+                        detection_stats['stampede_risk'] = risk_data
+                        
+                        # Calculate alert level based on people count and stampede risk
+                        risk_level = risk_data.get('level', 'LOW')
+                        if risk_level == 'HIGH':
+                            detection_stats['alert_level'] = 4  # Stampede Risk
+                        elif risk_level == 'MEDIUM':
+                            detection_stats['alert_level'] = 3  # High Risk
+                        elif people_count <= Config.ALERT_THRESHOLDS["CAUTION"]:
+                            detection_stats['alert_level'] = 0  # Normal
+                        elif people_count <= Config.ALERT_THRESHOLDS["WARNING"]:
+                            detection_stats['alert_level'] = 1  # Caution
+                        elif people_count <= Config.ALERT_THRESHOLDS["CRITICAL"]:
+                            detection_stats['alert_level'] = 2  # Warning
+                        else:
+                            detection_stats['alert_level'] = 3  # Critical
+                        
+                        # Calculate FPS more frequently for better accuracy
+                        frame_count += 1
+                        if frame_count % 10 == 0:  # Update FPS every 10 frames
+                            elapsed_time = time.time() - start_time
+                            if elapsed_time > 0:  # Avoid division by zero
+                                detection_stats['fps'] = round(frame_count / elapsed_time, 2)
+                            frame_count = 0
+                            start_time = time.time()
+                        
+                        last_stats_update = current_time
+                    
+                    # Store the processed frame
+                    with frame_lock:
+                        current_frame = processed_frame
+                        
+                except Exception as e:
+                    if not error_logged:
+                        print(f"Error in video processing: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        error_logged = True
+                    # Frame is already stored as fallback above
+            else:
+                # Detector not initialized - frame already stored as fallback
+                if not error_logged:
+                    print("Warning: Detector not initialized in video processing")
+                    error_logged = True
+        
+        except Exception as e:
+            print(f"Unexpected error in process_video_continuously: {e}")
+            import traceback
+            traceback.print_exc()
+            video_processing = False
+            break
         
         # Sleep to match video FPS for accurate real-time processing
         time.sleep(frame_delay)
@@ -295,15 +344,42 @@ def video_feed():
     """Video streaming route"""
     def generate_frames():
         global current_frame
+        last_good_frame = None
+        frame_skip_count = 0
+        
         while True:
-            with frame_lock:
-                if current_frame is not None:
-                    # Encode frame as JPEG with quality setting for better performance
-                    ret, buffer = cv2.imencode('.jpg', current_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
-                    if ret:
-                        frame_bytes = buffer.tobytes()
-                        yield (b'--frame\r\n'
-                               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            try:
+                with frame_lock:
+                    frame_to_send = current_frame
+                
+                # Use last good frame as fallback if current is None
+                if frame_to_send is None:
+                    if last_good_frame is None:
+                        # Create a placeholder frame if we have nothing to show
+                        placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
+                        cv2.putText(placeholder, "Waiting for camera feed...", (50, 240), 
+                                  cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                        frame_to_send = placeholder
+                    else:
+                        frame_to_send = last_good_frame
+                else:
+                    last_good_frame = frame_to_send
+                
+                # Encode frame as JPEG with quality setting for better performance
+                ret, buffer = cv2.imencode('.jpg', frame_to_send, [int(cv2.IMWRITE_JPEG_QUALITY), 85])
+                if ret:
+                    frame_bytes = buffer.tobytes()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n'
+                           b'Content-Length: ' + str(len(frame_bytes)).encode() + b'\r\n\r\n' + 
+                           frame_bytes + b'\r\n')
+                else:
+                    print("Failed to encode frame as JPEG")
+            except Exception as e:
+                print(f"Error in generate_frames: {e}")
+                import traceback
+                traceback.print_exc()
+            
             time.sleep(0.01)  # Short sleep for streaming FPS
     
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -391,10 +467,23 @@ def export_stampede_report():
 
 def main():
     """Main function to run the Crowd Management System"""
+    print("=" * 60)
     print("Starting Advanced Crowd Management System...")
+    print("=" * 60)
     
     # Initialize detector
-    initialize_detector()
+    detector_ok = initialize_detector()
+    if not detector_ok:
+        print("\n⚠️  Warning: Detector failed to initialize!")
+        print("The system will display raw camera feed without detection.")
+        print("Check that YOLO weights file (yolov3.weights) is present and valid.")
+    
+    print(f"\n📊 Web Server Configuration:")
+    print(f"   Host: {Config.HOST}")
+    print(f"   Port: {Config.PORT}")
+    print(f"   Debug: {Config.DEBUG}")
+    print(f"\n🚀 Starting Flask app at http://localhost:{Config.PORT}")
+    print("=" * 60)
     
     # Run Flask app
     app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG, threaded=True)

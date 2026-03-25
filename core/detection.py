@@ -130,16 +130,45 @@ class CrowdDetector:
     def initialize_models(self):
         """Initialize YOLO and Haar Cascade models"""
         try:
+            # Get the base directory (parent of core directory)
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            
+            # Construct full paths to model files
+            weights_path = os.path.join(base_dir, "yolov3.weights")
+            cfg_path = os.path.join(base_dir, "yolov3.cfg")
+            names_path = os.path.join(base_dir, "coco.names")
+            cascade_path = os.path.join(base_dir, "haarcascade_frontalface_default.xml")
+            
+            # Check if files exist
+            for file_path, file_name in [
+                (weights_path, "yolov3.weights"),
+                (cfg_path, "yolov3.cfg"),
+                (names_path, "coco.names"),
+                (cascade_path, "haarcascade_frontalface_default.xml")
+            ]:
+                if not os.path.exists(file_path):
+                    print(f"Warning: {file_name} not found at {file_path}")
+            
             # Load YOLO
-            self.net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
-            with open("coco.names", "r") as f:
+            print(f"Loading YOLO network from: {weights_path}")
+            self.net = cv2.dnn.readNet(weights_path, cfg_path)
+            print("✓ YOLO network loaded successfully")
+            
+            with open(names_path, "r") as f:
                 self.classes = f.read().strip().split("\n")
+            print(f"✓ Loaded {len(self.classes)} COCO classes")
             
             # Face detection
-            cascade_path = "haarcascade_frontalface_default.xml"
             self.face_cascade = cv2.CascadeClassifier(cascade_path)
+            if self.face_cascade.empty():
+                print(f"Warning: Could not load Haar Cascade from {cascade_path}")
+            else:
+                print("✓ Haar Cascade loaded successfully")
+                
         except Exception as e:
             print(f"Error initializing models: {e}")
+            import traceback
+            traceback.print_exc()
             raise
     
     def initialize_database(self):
